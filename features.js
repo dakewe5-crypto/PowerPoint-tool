@@ -40,7 +40,31 @@ async function syncTextFields(ctx, shape) {
   });
 }
 
+/* Pfeile an den Texträndern: Rand aller markierten Formen pro Klick um stepCm ändern (nie unter 0). */
+async function stepMargin(id, dir) {
+  const prop = MARGIN_FIELDS[id];
+  const d = dir * CFG.stepCm * CM;
+  try {
+    await PowerPoint.run(async (ctx) => {
+      const all = await getSel(ctx);
+      if (!all.length) throw new UserError("Zuerst Objekte auf der Folie markieren.");
+      const items = all.filter((s) => TEXT_TYPES.includes(s.type));
+      if (!items.length) throw new UserError("In der Auswahl gibt es keine Form mit Textfeld.");
+      items.forEach((s) => s.textFrame.load(prop));
+      await ctx.sync();
+      items.forEach((s) => { s.textFrame[prop] = Math.max(0, s.textFrame[prop] + d); });
+      await ctx.sync();
+    });
+    refreshSelection();
+  } catch (e) {
+    toast(e instanceof UserError ? e.message : "Fehler: " + (e.message || e), "warn");
+  }
+}
+
 function initTextOptions() {
+  document.querySelectorAll("[data-mstep]").forEach((b) => b.addEventListener("click", () => {
+    stepMargin(b.dataset.mstep, Number(b.dataset.dir));
+  }));
   document.querySelectorAll("[data-valign]").forEach((b) => b.addEventListener("click", async () => {
     const ok = await textOp((tf) => { tf.verticalAlignment = b.dataset.valign; });
     if (ok) document.querySelectorAll("[data-valign]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));

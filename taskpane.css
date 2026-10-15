@@ -398,3 +398,18 @@ input[type="search"] { width: 100%; }
 }
 .ic:hover { background: var(--hover); border-color: #b9c8e6; }
 .ic svg { width: 24px; height: 24px; stroke-width: var(--sw, 2); }
+
+/* Textrand-Felder mit Pfeilen */
+.margins .mfield { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+.margins .mbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding-right: 3px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+.margins .mbox:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.margins .mbox input { flex: 1; min-width: 0; height: 30px; padding: 0 8px; border: 0; outline: 0; background: none; }

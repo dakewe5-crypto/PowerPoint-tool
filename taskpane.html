@@ -78,10 +78,42 @@
       <label data-tip-title="Form anpassen" data-tip="Die Form wächst oder schrumpft passend zur Textmenge."><input type="radio" name="autosize" value="AutoSizeShapeToFitText"> Größe der Form dem Text anpassen</label>
     </fieldset>
     <div class="margins">
-      <label data-tip-title="Linker Rand" data-tip="Abstand zwischen Formkante und Text links. Wirkt auf alle markierten Formen."><span>Linker Rand</span><input id="mL" type="text" inputmode="decimal" autocomplete="off"></label>
-      <label data-tip-title="Rechter Rand" data-tip="Abstand zwischen Formkante und Text rechts."><span>Rechter Rand</span><input id="mR" type="text" inputmode="decimal" autocomplete="off"></label>
-      <label data-tip-title="Oberer Rand" data-tip="Abstand zwischen Formkante und Text oben."><span>Oberer Rand</span><input id="mT" type="text" inputmode="decimal" autocomplete="off"></label>
-      <label data-tip-title="Unterer Rand" data-tip="Abstand zwischen Formkante und Text unten."><span>Unterer Rand</span><input id="mB" type="text" inputmode="decimal" autocomplete="off"></label>
+      <div class="mfield" data-tip-title="Linker Rand" data-tip="Abstand zwischen Formkante und Text links. Wirkt auf alle markierten Formen. Pfeile: ±0,1 cm pro Klick.">
+        <label for="mL">Linker Rand</label>
+        <div class="mbox"><input id="mL" type="text" inputmode="decimal" autocomplete="off">
+          <span class="step">
+            <button type="button" data-mstep="mL" data-dir="1" aria-label="Linken Rand um 0,1 cm vergrößern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></button>
+            <button type="button" data-mstep="mL" data-dir="-1" aria-label="Linken Rand um 0,1 cm verkleinern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+          </span>
+        </div>
+      </div>
+      <div class="mfield" data-tip-title="Rechter Rand" data-tip="Abstand zwischen Formkante und Text rechts. Pfeile: ±0,1 cm pro Klick.">
+        <label for="mR">Rechter Rand</label>
+        <div class="mbox"><input id="mR" type="text" inputmode="decimal" autocomplete="off">
+          <span class="step">
+            <button type="button" data-mstep="mR" data-dir="1" aria-label="Rechten Rand um 0,1 cm vergrößern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></button>
+            <button type="button" data-mstep="mR" data-dir="-1" aria-label="Rechten Rand um 0,1 cm verkleinern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+          </span>
+        </div>
+      </div>
+      <div class="mfield" data-tip-title="Oberer Rand" data-tip="Abstand zwischen Formkante und Text oben. Pfeile: ±0,1 cm pro Klick.">
+        <label for="mT">Oberer Rand</label>
+        <div class="mbox"><input id="mT" type="text" inputmode="decimal" autocomplete="off">
+          <span class="step">
+            <button type="button" data-mstep="mT" data-dir="1" aria-label="Oberen Rand um 0,1 cm vergrößern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></button>
+            <button type="button" data-mstep="mT" data-dir="-1" aria-label="Oberen Rand um 0,1 cm verkleinern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+          </span>
+        </div>
+      </div>
+      <div class="mfield" data-tip-title="Unterer Rand" data-tip="Abstand zwischen Formkante und Text unten. Pfeile: ±0,1 cm pro Klick.">
+        <label for="mB">Unterer Rand</label>
+        <div class="mbox"><input id="mB" type="text" inputmode="decimal" autocomplete="off">
+          <span class="step">
+            <button type="button" data-mstep="mB" data-dir="1" aria-label="Unteren Rand um 0,1 cm vergrößern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></button>
+            <button type="button" data-mstep="mB" data-dir="-1" aria-label="Unteren Rand um 0,1 cm verkleinern"><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+          </span>
+        </div>
+      </div>
     </div>
     <label class="check" data-tip-title="Text umbrechen" data-tip="Der Text bricht am Formrand um, statt in einer Zeile weiterzulaufen."><input type="checkbox" id="wrap"> Text in Form umbrechen</label>
   </details>
