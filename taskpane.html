@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<title>Folienbau</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<link rel="stylesheet" href="taskpane.css">
+</head>
+<body>
+
+<main>
+  <!-- Auswahl und Referenz -->
+  <section class="card" aria-label="Auswahl">
+    <p id="selCount" class="sel-count">Nichts markiert</p>
+    <p id="selHint" class="sel-hint">Objekte auf der Folie markieren.</p>
+    <div class="seg" role="radiogroup" aria-label="Referenz">
+      <button type="button" role="radio" data-ref="first" data-tip-title="Referenz: erstes Objekt" data-tip="Ausrichten, Andocken und Größe richten sich nach dem zuerst markierten Objekt.">Erstes</button>
+      <button type="button" role="radio" data-ref="largest" data-tip-title="Referenz: größtes Objekt" data-tip="Alles richtet sich nach dem flächenmäßig größten markierten Objekt.">Größtes</button>
+      <button type="button" role="radio" data-ref="slide" data-tip-title="Referenz: Folie" data-tip="Alles richtet sich nach den Folienrändern.">Folie</button>
+    </div>
+  </section>
+
+  <details open data-sec="position">
+    <summary>Position</summary>
+    <div class="grid g6" data-group="align"></div>
+    <div class="grid g6" data-group="dock"></div>
+    <div class="grid g6" data-group="arrange"></div>
+    <div class="field-row">
+      <label for="gap">Abstand</label>
+      <input id="gap" type="text" inputmode="decimal" autocomplete="off" value="0,25 cm">
+      <span class="field-hint">für Andocken, Stapeln, Raster</span>
+    </div>
+  </details>
+
+  <details open data-sec="size">
+    <summary>Größe angleichen</summary>
+    <div class="grid g6" data-group="size"></div>
+    <div class="grid g6" data-group="sizeSlide"></div>
+  </details>
+
+  <details open data-sec="setsize">
+    <summary>Größe setzen</summary>
+    <div class="size-set">
+      <div class="dim"><label for="w">B</label><input id="w" type="text" inputmode="decimal" autocomplete="off" placeholder="Breite">
+        <span class="step">
+          <button type="button" data-step="w" data-dir="1" aria-label="Breite um 0,1 cm vergrößern" data-tip-title="Breite +0,1 cm" data-tip="Macht die markierten Objekte pro Klick 0,1 cm breiter."><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></button>
+          <button type="button" data-step="w" data-dir="-1" aria-label="Breite um 0,1 cm verkleinern" data-tip-title="Breite −0,1 cm" data-tip="Macht die markierten Objekte pro Klick 0,1 cm schmaler."><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+        </span>
+      </div>
+      <button type="button" id="lock" class="lock" aria-pressed="true" aria-label="Seitenverhältnis beibehalten" data-tip-title="Seitenverhältnis" data-tip="Wenn aktiv, wird beim Ändern der Breite die Höhe passend mitgerechnet (und umgekehrt) – auch bei den Pfeilen.">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="9" width="10" height="8" rx="1"/><path d="M7 9V7a3 3 0 016 0v2"/></svg>
+      </button>
+      <div class="dim"><label for="h">H</label><input id="h" type="text" inputmode="decimal" autocomplete="off" placeholder="Höhe">
+        <span class="step">
+          <button type="button" data-step="h" data-dir="1" aria-label="Höhe um 0,1 cm vergrößern" data-tip-title="Höhe +0,1 cm" data-tip="Macht die markierten Objekte pro Klick 0,1 cm höher."><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5l4-4 4 4"/></svg></button>
+          <button type="button" data-step="h" data-dir="-1" aria-label="Höhe um 0,1 cm verkleinern" data-tip-title="Höhe −0,1 cm" data-tip="Macht die markierten Objekte pro Klick 0,1 cm niedriger."><svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+        </span>
+      </div>
+    </div>
+    <button type="button" id="applySize" class="primary" data-tip-title="Größe anwenden" data-tip="Setzt Breite und Höhe für alle markierten Objekte. Leere Felder bleiben unverändert.">Größe auf Auswahl anwenden</button>
+  </details>
+
+  <details open data-sec="order">
+    <summary>Ebenen und Gruppieren</summary>
+    <div class="grid g6" data-group="order"></div>
+  </details>
+
+  <details data-sec="color">
+    <summary>Farbe</summary>
+    <div class="seg" role="radiogroup" aria-label="Farbe anwenden auf">
+      <button type="button" role="radio" data-target="fill" data-tip-title="Füllung" data-tip="Farbfelder färben die Füllung der markierten Objekte.">Füllung</button>
+      <button type="button" role="radio" data-target="line" data-tip-title="Kontur" data-tip="Farbfelder färben die Linie bzw. den Rahmen.">Kontur</button>
+      <button type="button" role="radio" data-target="text" data-tip-title="Text" data-tip="Farbfelder färben den Text in den markierten Objekten.">Text</button>
+    </div>
+    <div class="swatches" data-group="palette"></div>
+  </details>
+
+  <details data-sec="format">
+    <summary>Schrift und Format</summary>
+    <div class="grid g2" data-group="format"></div>
+  </details>
+
+  <details data-sec="insert">
+    <summary>Elemente einfügen</summary>
+    <div class="grid g4" data-group="insert"></div>
+  </details>
+</main>
+
+<div id="msg" role="status" aria-live="polite"></div>
+<div id="tip" role="tooltip" hidden></div>
+
+<script src="taskpane.js"></script>
+</body>
+</html>
