@@ -16,7 +16,8 @@
     <p id="selCount" class="sel-count">Nichts markiert</p>
     <p id="selHint" class="sel-hint">Objekte auf der Folie markieren.</p>
     <div class="seg" role="radiogroup" aria-label="Referenz">
-      <button type="button" role="radio" data-ref="first" data-tip-title="Referenz: erstes Objekt" data-tip="Ausrichten, Andocken und Größe richten sich nach dem zuerst markierten Objekt.">Erstes</button>
+      <button type="button" role="radio" data-ref="first" data-tip-title="Referenz: erstes Objekt" data-tip="Alles richtet sich nach dem zuerst angeklickten Objekt, die anderen werden angeglichen.">Erstes</button>
+      <button type="button" role="radio" data-ref="last" data-tip-title="Referenz: letztes Objekt" data-tip="Alles richtet sich nach dem zuletzt angeklickten Objekt, die zuvor markierten werden daran angeglichen.">Letztes</button>
       <button type="button" role="radio" data-ref="largest" data-tip-title="Referenz: größtes Objekt" data-tip="Alles richtet sich nach dem flächenmäßig größten markierten Objekt.">Größtes</button>
       <button type="button" role="radio" data-ref="slide" data-tip-title="Referenz: Folie" data-tip="Alles richtet sich nach den Folienrändern.">Folie</button>
     </div>
@@ -60,11 +61,44 @@
       </div>
     </div>
     <button type="button" id="applySize" class="primary" data-tip-title="Größe anwenden" data-tip="Setzt Breite und Höhe für alle markierten Objekte. Leere Felder bleiben unverändert.">Größe auf Auswahl anwenden</button>
+
+    <div class="sub">Textfeld</div>
+    <div class="field-row">
+      <span class="lbl">Vertikal</span>
+      <div class="seg" id="vAlign" role="radiogroup" aria-label="Vertikale Ausrichtung">
+        <button type="button" role="radio" data-valign="Top" data-tip-title="Text oben" data-tip="Richtet den Text im Textfeld am oberen Rand aus.">Oben</button>
+        <button type="button" role="radio" data-valign="Middle" data-tip-title="Text mittig" data-tip="Zentriert den Text im Textfeld senkrecht.">Mitte</button>
+        <button type="button" role="radio" data-valign="Bottom" data-tip-title="Text unten" data-tip="Richtet den Text im Textfeld am unteren Rand aus.">Unten</button>
+      </div>
+    </div>
+    <fieldset class="radios">
+      <legend class="sr">Textanpassung</legend>
+      <label data-tip-title="Nicht anpassen" data-tip="Form und Text bleiben unabhängig voneinander, der Text kann überstehen."><input type="radio" name="autosize" value="AutoSizeNone"> Größe nicht automatisch anpassen</label>
+      <label data-tip-title="Text verkleinern" data-tip="Die Schrift schrumpft automatisch, damit der Text in die Form passt."><input type="radio" name="autosize" value="AutoSizeTextToFitShape"> Text bei Überlauf verkleinern</label>
+      <label data-tip-title="Form anpassen" data-tip="Die Form wächst oder schrumpft passend zur Textmenge."><input type="radio" name="autosize" value="AutoSizeShapeToFitText"> Größe der Form dem Text anpassen</label>
+    </fieldset>
+    <div class="margins">
+      <label data-tip-title="Linker Rand" data-tip="Abstand zwischen Formkante und Text links. Wirkt auf alle markierten Formen."><span>Linker Rand</span><input id="mL" type="text" inputmode="decimal" autocomplete="off"></label>
+      <label data-tip-title="Rechter Rand" data-tip="Abstand zwischen Formkante und Text rechts."><span>Rechter Rand</span><input id="mR" type="text" inputmode="decimal" autocomplete="off"></label>
+      <label data-tip-title="Oberer Rand" data-tip="Abstand zwischen Formkante und Text oben."><span>Oberer Rand</span><input id="mT" type="text" inputmode="decimal" autocomplete="off"></label>
+      <label data-tip-title="Unterer Rand" data-tip="Abstand zwischen Formkante und Text unten."><span>Unterer Rand</span><input id="mB" type="text" inputmode="decimal" autocomplete="off"></label>
+    </div>
+    <label class="check" data-tip-title="Text umbrechen" data-tip="Der Text bricht am Formrand um, statt in einer Zeile weiterzulaufen."><input type="checkbox" id="wrap"> Text in Form umbrechen</label>
   </details>
 
   <details open data-sec="order">
     <summary>Ebenen und Gruppieren</summary>
     <div class="grid g6" data-group="order"></div>
+  </details>
+
+  <details open data-sec="shape">
+    <summary>Form angleichen</summary>
+    <button type="button" id="matchShape" class="primary" data-tip-title="Form wie Referenz" data-tip="Wandelt die anderen markierten Formen in die Formart der Referenz um, z. B. Pfeil → Rechteck. Position, Größe, Farbe und Text bleiben.">Form wie Referenz übernehmen</button>
+    <div class="field-row">
+      <select id="shapeType" aria-label="Zielform" data-tip-title="Zielform" data-tip="Formart, in die die markierten Objekte umgewandelt werden."></select>
+      <button type="button" id="applyShapeType" class="btn" data-tip-title="Umwandeln" data-tip="Wandelt alle markierten Formen in die gewählte Formart um.">Umwandeln</button>
+    </div>
+    <p class="note">Ersetzt die Form durch eine neue mit gleicher Position, Größe, Füllung, Linie und Text. Eckenradius und Animationen gehen dabei verloren.</p>
   </details>
 
   <details data-sec="color">
@@ -82,6 +116,31 @@
     <div class="grid g2" data-group="format"></div>
   </details>
 
+  <details data-sec="icons">
+    <summary>Icons</summary>
+    <input id="iconSearch" type="search" autocomplete="off" placeholder="Suchen, z. B. Pfeil, Haken, Euro, Team" aria-label="Icon suchen">
+    <div class="icon-opts">
+      <div class="swatches" id="iconSw" role="radiogroup" aria-label="Icon-Farbe"></div>
+      <div class="icon-row">
+        <label class="mini" data-tip-title="Eigene Farbe" data-tip="Beliebige Farbe für das Icon wählen."><span>Farbe</span><input type="color" id="iconColor" value="#1f3a5f"></label>
+        <label class="mini" data-tip-title="Icon-Größe" data-tip="Kantenlänge des eingefügten Icons, z. B. 2 cm."><span>Größe</span><input type="text" id="iconSize" inputmode="decimal" autocomplete="off" value="2,00 cm"></label>
+        <label class="mini" data-tip-title="Strichstärke" data-tip="Dicke der Linien im Icon."><span>Linie</span>
+          <select id="iconStroke">
+            <option value="1">Dünn</option>
+            <option value="1.5">Fein</option>
+            <option value="2" selected>Normal</option>
+            <option value="2.5">Kräftig</option>
+            <option value="3">Fett</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <p id="iconInfo" class="note">Wird beim ersten Öffnen geladen …</p>
+    <div class="ic-grid" id="iconGrid"></div>
+    <button type="button" id="iconMore" class="btn" hidden>Mehr anzeigen</button>
+    <p class="note">Icons: <a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a> (ISC-Lizenz). Einfügen in der Mitte der Folie, danach frei verschieb- und einfärbbar.</p>
+  </details>
+
   <details data-sec="insert">
     <summary>Elemente einfügen</summary>
     <div class="grid g4" data-group="insert"></div>
@@ -92,5 +151,6 @@
 <div id="tip" role="tooltip" hidden></div>
 
 <script src="taskpane.js"></script>
+<script src="features.js"></script>
 </body>
 </html>

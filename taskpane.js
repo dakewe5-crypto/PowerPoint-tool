@@ -24,7 +24,7 @@ const FILL_TYPES = ["GeometricShape", "TextBox", "Freeform", "Callout", "Placeho
 const TEXT_TYPES = ["GeometricShape", "TextBox", "Freeform", "Callout", "Placeholder"];
 const LINE_TYPES = ["GeometricShape", "TextBox", "Freeform", "Callout", "Placeholder", "Line", "Image"];
 
-const state = { ref: "first", target: "fill", lock: true, ratio: 1, selKey: "" };
+const state = { ref: "last", target: "fill", lock: true, ratio: 1, selKey: "", order: [] };
 
 /* ---------- Icons (SVG-Innenleben, 20x20) ---------- */
 const I = {
@@ -176,11 +176,23 @@ function load(key, fallback) { try { const v = localStorage.getItem("fb." + key)
 
 const BASE_PROPS = "items/id,items/name,items/type,items/left,items/top,items/width,items/height";
 
+/* Klick-Reihenfolge der Auswahl mitschreiben: PowerPoint liefert die Formen nicht in Klick-Reihenfolge,
+ * deshalb merkt sich das Add-in, welche Form wann neu dazugekommen ist. */
+function updateOrder(ids) {
+  const set = new Set(ids);
+  const kept = state.order.filter((id) => set.has(id));
+  const known = new Set(kept);
+  state.order = kept.concat(ids.filter((id) => !known.has(id)));
+}
+
 async function getSel(ctx) {
   const shapes = ctx.presentation.getSelectedShapes();
   shapes.load(BASE_PROPS);
   await ctx.sync();
-  return shapes.items;
+  const items = shapes.items;
+  updateOrder(items.map((s) => s.id));
+  const rank = new Map(state.order.map((id, i) => [id, i]));
+  return items.slice().sort((a, b) => rank.get(a.id) - rank.get(b.id));
 }
 
 async function slideBox(ctx) {
@@ -198,6 +210,10 @@ async function slideBox(ctx) {
 /* Referenz bestimmen: { box, shape } */
 async function getRef(ctx, items) {
   if (state.ref === "slide") return { box: await slideBox(ctx), shape: null };
+  if (state.ref === "last") {
+    const s = items[items.length - 1];
+    return { box: s, shape: s };
+  }
   if (state.ref === "largest") {
     const s = items.reduce((a, b) => (b.width * b.height > a.width * a.height ? b : a));
     return { box: s, shape: s };
@@ -206,7 +222,7 @@ async function getRef(ctx, items) {
 }
 
 function needRefShape(ref) {
-  if (!ref.shape) throw new UserError("Diese Funktion braucht ein Objekt als Referenz – bitte „Erstes“ oder „Größtes“ wählen.");
+  if (!ref.shape) throw new UserError("Diese Funktion braucht ein Objekt als Referenz – bitte „Letztes“, „Erstes“ oder „Größtes“ wählen.");
 }
 
 /* ---------- Operationen ---------- */
@@ -486,12 +502,12 @@ function buildButtons() {
 function setupSegments() {
   const refBtns = document.querySelectorAll("[data-ref]");
   const setRef = (v) => {
-    state.ref = v; save("ref", v);
+    state.ref = v; save("ref2", v);
     refBtns.forEach((b) => b.setAttribute("aria-checked", String(b.dataset.ref === v)));
     refreshSelection();
   };
   refBtns.forEach((b) => b.addEventListener("click", () => setRef(b.dataset.ref)));
-  setRef(load("ref", "first"));
+  setRef(load("ref2", "last"));
 
   const tgtBtns = document.querySelectorAll("[data-target]");
   const setTgt = (v) => {
@@ -583,9 +599,12 @@ async function stepSize(dim, dir) {
 
 /* ---------- Auswahlanzeige ---------- */
 let selTimer = null;
-function scheduleRefresh() { clearTimeout(selTimer); selTimer = setTimeout(refreshSelection, 120); }
+let refreshBusy = false;
+function scheduleRefresh() { clearTimeout(selTimer); selTimer = setTimeout(refreshSelection, 40); }
 
 async function refreshSelection() {
+  if (refreshBusy) return;
+  refreshBusy = true;
   const count = document.getElementById("selCount");
   const hint = document.getElementById("selHint");
   try {
@@ -600,15 +619,16 @@ async function refreshSelection() {
       count.textContent = n + (n === 1 ? " Objekt markiert" : " Objekte markiert");
       let refName;
       let box;
+      let refShape = items[items.length - 1];
       if (state.ref === "slide") { refName = "Folie"; box = null; }
       else {
         const r = await getRef(ctx, items);
-        refName = r.shape.name; box = r.box;
+        refName = r.shape.name; box = r.box; refShape = r.shape;
       }
       hint.textContent = "Referenz: " + refName;
       const first = box || items[0];
       state.ratio = first.height / first.width;
-      const key = items.map((s) => s.id).join(",") + "|" + state.ref;
+      const key = items.map((s) => s.id).join(",") + "|" + state.ref + "|" + state.order.join(",");
       if (key !== state.selKey) {
         state.selKey = key;
         const w = document.getElementById("w"), h = document.getElementById("h");
@@ -617,10 +637,13 @@ async function refreshSelection() {
           h.value = fmtCm(first.height);
         }
       }
+      if (typeof syncTextFields === "function") await syncTextFields(ctx, refShape);
     });
   } catch (e) {
     count.textContent = "Auswahl nicht lesbar";
     hint.textContent = "Bitte Folienansicht öffnen.";
+  } finally {
+    refreshBusy = false;
   }
 }
 
@@ -670,11 +693,13 @@ function setupSections() {
 }
 
 /* ---------- Start ---------- */
-Office.onReady((info) => {
+/* Wird am Ende von features.js über Office.onReady aufgerufen, damit alle Funktionen vorher geladen sind. */
+function boot(info) {
   buildButtons();
   setupSegments();
   setupSizeFields();
   setupTooltips();
+  if (typeof initFeatures === "function") initFeatures();
   setupSections();
   document.getElementById("gap").value = load("gap", fmtCm(CFG.defaultGapCm * CM));
 
@@ -683,5 +708,7 @@ Office.onReady((info) => {
     return;
   }
   Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, scheduleRefresh);
+  /* Zusätzlich abfragen: nicht jede Auswahländerung löst das Ereignis zuverlässig aus. */
+  setInterval(() => { if (!document.hidden) refreshSelection(); }, 700);
   refreshSelection();
-});
+}
